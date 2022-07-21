@@ -1,0 +1,80 @@
+<!-- Start of Afterpay assets -->
+<script type="application/javascript" data-src="https://static-us.afterpay.com/javascript/present-afterpay.js"></script>
+<script>
+  const isGiftCard = (item) => item.product_type === "Gift Card";
+  
+  function giftCardDetected() {
+    const afterpayProduct = {{ product | json }};
+    const afterpayCartItems = {{ cart.items | json }};
+    
+    if(afterpayProduct) {
+	  return (afterpayProduct.type === "Gift Card");
+    }
+
+    if(afterpayCartItems) {
+	  return (afterpayCartItems.some(isGiftCard));
+    } 
+    return false;
+  }
+  let amount = 0, priceSelector = "", locale = 'en_US';
+  let baseObserverConfig = { activated: true, isDecimalPrice: true };
+  let mutationObserver = null;
+  
+	{%case template.name%} 
+      {%when "product"%}
+  		amount = {{product.selected_or_first_available_variant.price | json}}; 
+        priceSelector = ".product-price:nth-child(3) > .product-normal-price";
+	    mutationObserver = { 
+            ...baseObserverConfig, 
+			targetPriceSelector: '',
+		};
+        
+      {%when "cart"%}     
+        amount = {{cart.total_price | json}}; 
+        priceSelector = ".cart-total-price > span:nth-child(2)";
+// 		mutationObserver = { 
+//             ...baseObserverConfig, 
+// 			targetPriceSelector: '',
+// 		};
+  	  {% when "product" or "cart"%}
+        const apConfig = {
+          afterpayLogoColor: 'color',
+          priceSelector, locale, amount,
+          showUpperLimit: false,
+          mutationObserver,
+          minMaxThreshold: {
+            min: 100,
+            max: 100000
+          },
+          hideAfterpay: giftCardDetected()
+        };
+
+        window.addEventListener("load",function(){
+          new presentAfterpay(apConfig).init();
+        });
+  {%endcase%}
+</script>
+
+<style type="text/css">
+  .afterpay-logo {
+    width: 5.5em !important;
+    height: auto !important;
+  }
+  .afterpay-paragraph {
+    font-size: 0.9em;
+    margin-bottom: 18px !important;
+  }
+  {%case template.name%} 
+  	{%when "cart"%}
+      .afterpay-paragraph {
+		font-size: 0.75em;
+      }
+  	{%when "product"%}
+      .afterpay-paragraph {
+        clear: both;
+        padding-bottom: 23px;
+        font-size: 0.7em;
+      }
+  {%endcase%}
+</style>
+<!-- End of Afterpay assets -->

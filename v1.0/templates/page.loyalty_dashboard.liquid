@@ -1,0 +1,53 @@
+<div id='socialannex_dashboard'></div>
+<script type = 'text/javascript'>
+var sa_uni = sa_uni || [];
+var jwt = sa_emailid = token = '';
+var shop_domain = '{{shop.domain}}';
+var shop_url = '{{shop.secure_url}}';
+var primary_key='customer_email';
+if(primary_key=='customer_id'){
+var email = '{{customer.id}}';
+}
+else{
+var email = '{{customer.email}}';
+}
+function getJWT(){
+var data = {'store_id':shop_domain, 'payload':email};
+$.ajax({
+type: 'POST',
+url: shop_url+'/apps/loyalty/jwt_generator.php/',
+data: JSON.stringify(data),
+dataType: 'json',
+success: function(res) {
+if(res.errorcode == 0){
+jwt = res.data[0].jwt_token;
+var account_status = '{{shop.customer_accounts_enabled}}';
+if(account_status == 'true'){
+var cutsomer_status = '{{customer}}';
+if(cutsomer_status != ''){
+sa_emailid = email;
+token = jwt;
+sa_uni.push(['sa_pg', '5']);
+(function (){
+function sa_async_load(){
+var sa = document.createElement('script');
+sa.type = 'text/javascript';
+sa.async = true;
+sa.src = 'https://cdn.socialannex.com/partner/35722621/universal.js';
+var sax = document.getElementsByTagName('script')[0];
+sax.parentNode.insertBefore(sa, sax);
+}
+sa_async_load();
+})();
+}
+else{
+var login_link = '{{shop.secure_url}}{{routes.account_login_url}}';
+window.location.replace(login_link);
+}
+}
+}
+}
+});
+}
+getJWT();
+</script>

@@ -1,0 +1,140 @@
+<!-- {{ '//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js' | script_tag }} -->
+ {% if customer  %}
+    <script>
+          
+      var shop_url = '{{shop.secure_url}}';
+      var shop_domain = '{{shop.domain}}';
+      var permanent_domain = '{{shop.permanent_domain}}';
+      var payload = '{{customer.email}}';
+      var cid = '{{customer.id}}';
+      function getPoints(){
+        var data = {'store_id':shop_domain,'permanent_domain':permanent_domain, 'payload':payload,'customer_id':cid, 'action':'add_tier_tag'};
+        $.ajax({
+          type: 'POST',
+          url: shop_url+'/apps/loyalty/jwt_generator.php/',
+          data: JSON.stringify(data),
+          dataType: "json",
+          success: function(res) {
+          }
+        });                            
+      }
+      getPoints();
+    </script>
+    
+{% assign customerTags = customer.tags | join:',' %}
+
+  {% if customerTags contains 'Loyalty' %} 
+	<script>
+      var shop_url = '{{shop.secure_url}}';
+      var shop_domain = '{{shop.domain}}';
+      var payload = '{{customer.id}}';
+      var cemail = '{{customer.email}}';
+      var data = {'store_id':shop_domain, 'payload':payload,'id':cemail,'email':cemail, 'action':'loyaltymember', 'optInStatus':'YES', 'createAction': '101'};
+        $.ajax({
+          type: 'POST',
+          url: shop_url+'/apps/loyalty/jwt_generator.php',
+          data: JSON.stringify(data),
+          dataType: "json",
+          
+          success: function(res) {
+            console.log(res);
+          }
+        });  
+      
+      
+    </script>
+
+	{% endif %}
+
+{% if customerTags contains 'optin' or customerTags contains 'loyaltymember' %}
+ 
+{% else %}
+  <script>
+         
+      var shop_url = '{{shop.secure_url}}';
+      var shop_domain = '{{shop.domain}}';
+      var payload = '{{customer.id}}';
+      var cemail = '{{customer.email}}';
+      var firstname = '{{customer.first_name}}';
+      var lastname = '{{customer.lastname_name}}';
+      var permanent_domain = '{{shop.permanent_domain}}';
+      
+      function checkOldUser(){
+        var data = {'store_id':shop_domain,'payload':payload,'shop_domain_permanent':permanent_domain, 'id':cemail,'email':cemail, 'first_name':firstname, 'lastname':lastname, 'action': 'check_old_users'};
+        $.ajax({
+          type: 'POST',
+          url: shop_url+'/apps/loyalty/jwt_generator.php',
+          data: JSON.stringify(data),
+          dataType: "json",
+          success: function(res) {
+          }
+        });                            
+      }
+      setTimeout(function(){ 
+               checkOldUser();   
+           
+      }, 3000); 
+      
+    </script>
+
+{% endif %}    
+    
+  
+{% endif %}    
+<style>
+.lds-dual-ring {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 13px;
+  height: 13px;
+  margin: 1px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  border-color: #fff transparent #fff transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+#apply_dollar_button_wrapper{
+  padding-bottom:21px;
+  height:45px;
+}
+.reward-dashboard {
+    position: fixed;
+    bottom: 3%;
+    left: 1%;
+    background: #363f49;
+    border-radius: 30px;
+    color: #fff !important;
+    padding: 0 30px;
+    z-index: 999999 !important;
+}  
+.reward-dashboard a{
+    color: #fff !important;
+} 
+</style>
+<!-- Annex Cloud loyalty code end -->
+
+{% schema %}
+  {
+    "name": "Section name",
+    "settings": []
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}
