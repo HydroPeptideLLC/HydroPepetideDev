@@ -1,0 +1,33 @@
+
+
+{% schema %}
+  {
+    "name": "Section name",
+    "settings": []
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+
+  query {
+    customer(customerAccessToken: "6420726448309") {
+      id
+      firstName
+      lastName
+      acceptsMarketing
+      email
+      phone
+    }
+  }
+
+  function query_customer(res) {
+    console.log(res);
+  }
+
+  $('document').ready(() => {
+    query_customer();
+  })
+{% endjavascript %}
